@@ -10,7 +10,7 @@ router.get('/user-profile',
 )
 
 // Update user's profile picture
-router.put('/upadte-picture',
+router.put('/update-picture',
   middleware.stripToken,
   middleware.verifyToken,
   controller.UpdateUserPicture
