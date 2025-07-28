@@ -1,4 +1,4 @@
-const { User, Category } = require('../models')
+const { User } = require('../models')
 const middleware = require('../middleware');
 
 // Register Function
