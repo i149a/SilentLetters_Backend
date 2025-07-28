@@ -1,11 +1,12 @@
-const { User, Tag } = require('../models')
+const User = require('../models/User')
+const Tag = require('../models/Tag')
 const middleware = require('../middleware')
 const { populate } = require('dotenv')
 
 // Create a new tag Function
 const CreateTag = async (req, res) => {
     try {
-        const userId = req.user.id
+        const userId = res.locals.payload.id
         const newTag = await Tag.create({ ...req.body, author: userId }) // Creating a new tag by the user Id
 
         // Add tag to user's tag list
@@ -54,7 +55,7 @@ const DeleteTag = async (req, res) => {
 // Get my tags Function
 const GetMyTags = async (req, res) => {
     try {
-        const userId = req.user.id
+        const userId = res.locals.payload.id
         const myTags = await Tag.find({ author: userId }) // Find all tags created by user Id
 
         res.status(200).json(myTags) // Sends success response 
