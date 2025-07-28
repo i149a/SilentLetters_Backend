@@ -1,0 +1,19 @@
+const router = require('express').Router()
+const controller = require('../controllers/userController')
+const middleware = require('../middleware')
+
+// Get current user's profile
+router.get('/',
+  middleware.stripToken,
+  middleware.verifyToken,
+  controller.GetUserProfile
+)
+
+// Update user's profile picture
+router.put('/upadte-picture',
+  middleware.stripToken,
+  middleware.verifyToken,
+  controller.UpdateUserPicture
+)
+
+module.exports = router
