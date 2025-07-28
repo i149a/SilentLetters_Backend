@@ -6,7 +6,7 @@ A web application that gives users a space to express the words they never said,
 
 
 **🔗 Browse it live:**  
-Go Live: [Deployed Link of Silent Letters Backend]()
+Go Live: [Deployed Link of Silent Letters Backend](https://backend-silentletters.onrender.com)
 
 **✅ Trello Board**  
 Track the development progress and task assignments via Trello board:  
