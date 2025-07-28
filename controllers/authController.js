@@ -1,10 +1,10 @@
-const { User } = require('../models')
+const User = require('../models/User')
 const middleware = require('../middleware');
 
 // Register Function
 const Register = async (req, res) => {
     try {
-        const { username, email, password, pic } = req.body // Extract fields from the request body
+        const { username, email, password, picture } = req.body // Extract fields from the request body
 
         // Validate the required fields
         if (!username || !email || !password) {
@@ -25,7 +25,7 @@ const Register = async (req, res) => {
                 username,
                 email, 
                 password: passwordDigest, 
-                pic,
+                picture,
                 letters: [],
                 comments: [],
                 tags: []
@@ -149,7 +149,7 @@ const ForgetPassword = async (req, res) => {
             { password: passwordDigest},
             { new: true }
         )
-        return res.status(200).send({ status: 'Password Updated!', user: updatedPayload })
+        return res.status(200).send({ status: 'Password Updated!', user: user })
     } catch (error) {
         console.log(error)
         res.status(401).send({ status: 'Error', msg: 'An error has occurred in resetting password!' })
