@@ -3,7 +3,7 @@ const controller = require('../controllers/userController')
 const middleware = require('../middleware')
 
 // Get current user's profile
-router.get('/',
+router.get('/user-profile',
   middleware.stripToken,
   middleware.verifyToken,
   controller.GetUserProfile
