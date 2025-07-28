@@ -1,4 +1,6 @@
-const { Letter, User, Tag, Comment } = require('../models')
+const User = require('../models/User')
+const Letter = require('../models/Letter')
+const Comment = require('../models/Comment')
 const middleware = require('../middleware')
 const { populate } = require('dotenv')
 
@@ -6,30 +8,44 @@ const { populate } = require('dotenv')
 const CreateComment = async (req, res) => {
     try {
         const { content, letterId, isAnonymous } = req.body // Extract fields from the request body
+        const userId = req.user?.id || res.locals?.payload?.id // Use consistent ID source
+
+        // Validate required fields
+        if (!content || !letterId)
+            return res.status(400).json({ status: 'Error', msg: 'Content and letterId are required' })
+
+        // Check if the Letter exists
+        const letterExists = await Letter.exists({ _id: letterId });
+        if (!letterExists)
+            return res.status(404).json({ status: 'Error', msg: 'Letter not found' })
 
         // Create the comment
         const comment = await Comment.create({
             content,
             letter: letterId,
-            author: isAnonymous ? null : req.user.id
+            author: isAnonymous ? null : userId
         })
 
-        // Push comment to the Letter
-        await Letter.findByIdAndUpdate(letterId, {
-            $push: { comments: comment._id }
-        })
+        // Update Letter's comments array
+        await Letter.findByIdAndUpdate(
+            letterId,
+            { $push: { comments: comment._id } },
+            { new: true }
+        )
 
-        // If not anonymous, push to User's comment
-        if (!isAnonymous) {
-            await User.findByIdAndUpdate(req.user.id, {
-                $push: { comments: comment._id }
-            })
+        // Update User's comments array (if not anonymous)
+        if (!isAnonymous && userId) {
+            await User.findByIdAndUpdate(
+                userId,
+                { $push: { comments: comment._id } },
+                { new: true }
+            )
         }
 
         res.status(201).json(comment) // Sends success response 
     } catch (error) {
         console.log(error)
-        res.status(500).send({ status: 'Error', msg: 'Failed to craete comment' })
+        res.status(500).json({ status: 'Error', msg: 'Failed to create comment' })
     }
 }
 
@@ -44,7 +60,7 @@ const GetCommentsByLetter = async (req, res) => {
             .sort({ createdAt: -1 })
 
         res.status(200).json(comments) // Sends success response 
-    } catch (err) {
+    } catch (error) {
         console.log(error)
         res.status(500).send({ status: 'Error', msg: 'Failed to retrieve comments' })    
     }
@@ -55,6 +71,7 @@ const UpdateComment = async (req, res) => {
     try {
         const { id } = req.params
         const { content } = req.body // Extract fields from the request body
+        const userId = res.locals.payload.id
 
         // Find the comment
         const comment = await Comment.findById(id)
@@ -64,10 +81,9 @@ const UpdateComment = async (req, res) => {
             return res.status(404).json({ error: 'Comment not found' })
 
         // Only the original author can update
-        if (comment.author && comment.author.toString() !== req.user.id)
+        if (comment.author && comment.author.toString() !== userId)
             return res.status(403).json({ error: 'Unauthorized' })
     
-
         // Update comment content
         comment.content = content
         await comment.save()
@@ -83,6 +99,7 @@ const UpdateComment = async (req, res) => {
 const DeleteComment = async (req, res) => {
     try {
         const { id } = req.params
+        const userId = res.locals.payload.id
 
         // Find the comment
         const comment = await Comment.findById(id)
@@ -92,7 +109,7 @@ const DeleteComment = async (req, res) => {
             return res.status(404).json({ error: 'Comment not found' })
 
         // Author can delete only their comment
-        if (comment.author && comment.author.toString() !== req.user.id)
+        if (comment.author && comment.author.toString() !== userId)
             return res.status(403).json({ error: 'Unauthorized' })
 
         // Delete comment
@@ -110,7 +127,7 @@ const DeleteComment = async (req, res) => {
         })
         }
 
-        res.status(200).json({ message: 'Comment deleted successfully' })
+        res.status(200).json({ message: 'Comment deleted successfully' })  // Sends success response 
     } catch (error) {
         console.log(error)
         res.status(500).send({ status: 'Error', msg: 'Failed to delete comment' }) 
