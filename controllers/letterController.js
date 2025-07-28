@@ -1,4 +1,7 @@
-const { Letter, User, Tag, Comment } = require('../models')
+const User = require('../models/User')
+const Letter = require('../models/Letter')
+const Comment = require('../models/Comment')
+const Tag = require('../models/Tag')
 const middleware = require('../middleware')
 const { populate } = require('dotenv')
 
@@ -86,11 +89,11 @@ const UpdateLetter = async (req, res) => {
 
         // No letter found with this ID
         if (!letter)
-            return res.status(404).json({ status: 'Error', msg: 'Letter not found'})
+            return res.status(404).json({ status: 'Error', msg: 'Letter not found' })
 
         // Only author can update the letter
-        if(String(letter.author !== payload.id))
-            return res.status(403).json({ status: 'Error', msg: 'Unauthorized'})
+        if (String(letter.author) !== String(payload.id))
+            return res.status(403).json({ status: 'Error', msg: 'Unauthorized' })
 
         // Upadate fields
         letter.title = title || letter.title
@@ -124,14 +127,14 @@ const DeleteLetter = async (req, res) => {
             return res.status(404).json({ status: 'Error', msg: 'Letter not found'})
 
         // Only author can update the letter
-        if(String(letter.author !== payload.id))
+        if (String(letter.author) !== payload.id)
             return res.status(403).json({ status: 'Error', msg: 'Unauthorized'})
 
         // Delete the letter
         await Letter.findByIdAndDelete(id)
 
         // Remove the letter from user's list
-        await Letter.findByIdAndUpdate(payload.id, { $pull: { letters: id } })
+        await User.findByIdAndUpdate(payload.id, { $pull: { letters: id } })
 
         // Delete all comments related to the letter 
         await Comment.deleteMany({ letter: id })
