@@ -12,13 +12,13 @@ router.post('/:letterId/comments',
   controller.CreateComment
 )
 
-router.put('/update-comment/:id',
+router.put('/:id',
   middleware.stripToken,
   middleware.verifyToken,
   controller.UpdateComment
 )
 
-router.delete('/delete-comment/:id',
+router.delete('/:id',
   middleware.stripToken,
   middleware.verifyToken,
   controller.DeleteComment
