@@ -7,7 +7,8 @@ const { populate } = require('dotenv')
 // Create a new comment on a letter Function
 const CreateComment = async (req, res) => {
     try {
-        const { content, letterId, isAnonymous } = req.body // Extract fields from the request body
+        const { letterId } = req.params; // Now from URL params
+        const { content, isAnonymous } = req.body // Extract fields from the request body
         const userId = req.user?.id || res.locals?.payload?.id // Use consistent ID source
 
         // Validate required fields

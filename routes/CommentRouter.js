@@ -6,7 +6,7 @@ const middleware = require('../middleware')
 router.get('/:letterId/comments', controller.GetCommentsByLetter)
 
 // Protected routes - require authentication
-router.post('/create-comment', 
+router.post('/:letterId/comments', 
   middleware.stripToken,
   middleware.verifyToken,
   controller.CreateComment
