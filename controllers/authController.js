@@ -14,6 +14,7 @@ const Register = async (req, res) => {
             });
         }
 
+
         let passwordDigest = await middleware.hashPassword(password) // Hash the provided password
         let existingUser = await User.findOne({ email }) // Check if a user with this email already exists
 
@@ -62,10 +63,17 @@ const Login = async (req, res) => {
             // Create a payload for the JWT token
             let payload = {
                 id: user._id,
-                email: user.email
+                email: user.email,
+                username: user.username,
+                picture: user.picture 
             }
             let token = middleware.createToken(payload) // Generate and send the token
-            return res.status(200).send({ user: payload, token })
+            return res.status(200).send({ 
+                user: payload,
+                token,
+                username: user.username,
+                picture: user.picture
+            })
         }
         res.status(401).send({ status: 'Error', msg: 'Unauthorized' })
     } catch (error) {
@@ -156,10 +164,19 @@ const ForgetPassword = async (req, res) => {
     }
 }
 
-// Check Session Function 
+// Check Session Function
 const CheckSession = async (req, res) => {
     const { payload } = res.locals
-    res.status(200).send(payload)
+    const user = await User.findById(payload.id).select("username email picture")
+    if (!user) {
+        return res.status(404).send({ status: 'Error', msg: 'User not found' })
+    }
+    res.status(200).send({
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        picture: user.picture
+    })
 }
 
 module.exports = {

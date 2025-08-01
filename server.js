@@ -25,11 +25,11 @@ app.use(express.urlencoded({ extended: false }))
 // Mount routers
 app.use('/auth', AuthRouter)
 app.use('/letters', LetterRouter)
-app.use('/comments', CommentRouter)
+app.use('/letters', CommentRouter)
 app.use('/tags', TagRouter)
 app.use('/profile', UserRouter)
 
-app.use('/', (req, res) => {
+app.use('/test', (req, res) => {
   res.send('Connected!')
 })
 

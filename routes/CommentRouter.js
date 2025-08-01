@@ -3,7 +3,7 @@ const controller = require('../controllers/commentController')
 const middleware = require('../middleware')
 
 // Public routes - no authentication required
-router.get('/:letterId', controller.GetCommentsByLetter)
+router.get('/:letterId/comments', controller.GetCommentsByLetter)
 
 // Protected routes - require authentication
 router.post('/create-comment', 
@@ -23,5 +23,12 @@ router.delete('/delete-comment/:id',
   middleware.verifyToken,
   controller.DeleteComment
 )
+
+router.get('/:id',
+  middleware.stripToken, 
+  middleware.verifyToken, 
+  controller.GetCommentById
+)
+
 
 module.exports = router

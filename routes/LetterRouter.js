@@ -31,4 +31,10 @@ router.delete('/delete-letter/:id',
   controller.DeleteLetter
 )
 
+router.get('/by-tag/:tagId', 
+  middleware.stripToken,
+  middleware.verifyToken,
+  controller.GetLettersByTag
+);
+
 module.exports = router

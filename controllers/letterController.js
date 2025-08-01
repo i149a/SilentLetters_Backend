@@ -163,11 +163,27 @@ const GetMyLetters = async (req, res) => {
     }
 }
 
+// Get Letters By Tag Function
+const GetLettersByTag = async (req, res) => {
+    try {
+        const { tagId } = req.params;
+        const letters = await Letter.find({ tags: tagId })
+            .populate('author', 'username picture')
+            .sort({ createdAt: -1 })
+
+        res.status(200).json(letters)
+    } catch (error) {
+        console.error(error)
+        res.status(500).send({ status: 'Error', msg: 'Failed to fetch letters by tag' })
+    }
+}
+
 module.exports = {
     CreateLetter,
     GetPublicLetters,
     GetLetterById,
     UpdateLetter,
     DeleteLetter,
-    GetMyLetters
+    GetMyLetters,
+    GetLettersByTag
 }

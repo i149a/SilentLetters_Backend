@@ -134,9 +134,28 @@ const DeleteComment = async (req, res) => {
     }
 }
 
+const GetCommentById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const comment = await Comment.findById(id)
+            .populate('author', 'username picture');
+
+        if (!comment) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+
+        res.status(200).json(comment);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ status: 'Error', msg: 'Failed to retrieve comment' });
+    }
+};
+
 module.exports = {
     CreateComment,
     GetCommentsByLetter,
     UpdateComment,
-    DeleteComment
+    DeleteComment,
+    GetCommentById
 }
